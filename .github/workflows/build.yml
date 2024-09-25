@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, v1.7.3_]
   pull_request:
     branches: [main]
   release:
@@ -37,23 +37,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         arch: [auto64]
         gpu: [OFF]
         opt_level: [avx2]
         include:
-          - os: windows-latest
-            arch: auto64
-            gpu: OFF
-            opt_level: generic
-          - os: ubuntu-latest
-            arch: aarch64
-            gpu: OFF
-            opt_level: generic
-          - os: macos-latest
-            arch: arm64
-            gpu: OFF
-            opt_level: generic
           - os: ubuntu-latest
             arch: auto64
             gpu: ON
