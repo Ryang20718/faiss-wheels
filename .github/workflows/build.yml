@@ -1,12 +1,7 @@
 name: Build
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
-  release:
-    types: [published]
 
 jobs:
   build_sdist:
@@ -20,7 +15,7 @@ jobs:
 
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.x'
+          python-version: '3.12'
 
       - name: Apply patch
         run: cd faiss && git apply ../patch/faiss-rename-swigfaiss.patch && cd ..
@@ -28,7 +23,7 @@ jobs:
       - name: Build sdist
         run: python setup.py sdist
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./dist/*.tar.gz
 
@@ -37,23 +32,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         arch: [auto64]
-        gpu: [OFF]
+        gpu: [ON]
         opt_level: [avx2]
         include:
-          - os: windows-latest
-            arch: auto64
-            gpu: OFF
-            opt_level: generic
-          - os: ubuntu-latest
-            arch: aarch64
-            gpu: OFF
-            opt_level: generic
-          - os: macos-latest
-            arch: arm64
-            gpu: OFF
-            opt_level: generic
           - os: ubuntu-latest
             arch: auto64
             gpu: ON
@@ -73,39 +56,29 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.2
         env:
+          CIBW_BUILD: "cp312-*"
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_ENVIRONMENT_LINUX: >
             FAISS_OPT_LEVEL=${{ matrix.opt_level }}
-            FAISS_ENABLE_GPU=${{ matrix.gpu }}
-          CIBW_ENVIRONMENT_MACOS: >
-            FAISS_OPT_LEVEL=${{ matrix.opt_level }}
-            TARGET_ARCH=${{ matrix.arch }}
-            LIBOMP_USE_HIDDEN_HELPER_TASK=0
-            LIBOMP_NUM_HIDDEN_HELPER_THREADS=0
-          CIBW_ENVIRONMENT_WINDOWS: >
-            FAISS_OPT_LEVEL=${{ matrix.opt_level }}
-            CMAKE_PREFIX_PATH="c:\\opt"
-            PATH="${PATH};${CONDA}\\condabin;${CONDA}\\Library\\bin"
-            LIB="${LIB};${CMAKE_PREFIX_PATH}\\lib;${CONDA}\\Library\\lib"
-            CPATH="${CPATH};${CMAKE_PREFIX_PATH}\\include;${CONDA}\\Library\\include"
+            FAISS_ENABLE_GPU=ON
           CIBW_BEFORE_ALL: bash scripts/build_${{ runner.os }}.sh
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/*.whl
 
-  publish:
-    name: Upload packages to PyPI
-    needs: [build_sdist, build_wheels]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: dist
+  # publish:
+  #   name: Upload packages to PyPI
+  #   needs: [build_sdist, build_wheels]
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'release' && github.event.action == 'published'
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: artifact
+  #         path: dist
 
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: ${{ secrets.PYPI_USERNAME }}
-          password: ${{ secrets.PYPI_PASSWORD }}
+  #     - uses: pypa/gh-action-pypi-publish@release/v1
+  #       with:
+  #         user: ${{ secrets.PYPI_USERNAME }}
+  #         password: ${{ secrets.PYPI_PASSWORD }}
