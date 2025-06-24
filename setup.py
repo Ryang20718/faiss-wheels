@@ -267,5 +267,16 @@ setup(
     include_package_data=False,
     package_data={"": ["*.i", "*.h"]},
     ext_modules=ext_modules,
-    cmdclass={"build_py": CustomBuildPy},
+    cmdclass={'build_py': CustomBuildPy},
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: POSIX',
+        'Programming Language :: Python :: 3.12',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    ],
 )

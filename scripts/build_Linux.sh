@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 set -eux
-
-# Default compiler flags
-export CXXFLAGS=${CXXFLAGS:-"-fvisibility=hidden -fdata-sections -ffunction-sections"}
+export CXXFLAGS="-fvisibility=hidden -fdata-sections -ffunction-sections"
+FAISS_ENABLE_GPU=${FAISS_ENABLE_GPU:-"ON"}
+FAISS_OPT_LEVEL=${FAISS_OPT_LEVEL:-"generic"}
 
 # Check if swig is available
 if ! command -v swig &> /dev/null; then
