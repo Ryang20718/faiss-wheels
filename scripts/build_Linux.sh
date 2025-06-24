@@ -2,7 +2,7 @@
 
 export CXXFLAGS="-fvisibility=hidden -fdata-sections -ffunction-sections"
 
-FAISS_ENABLE_GPU=${FAISS_ENABLE_GPU:-"OFF"}
+FAISS_ENABLE_GPU=${FAISS_ENABLE_GPU:-"ON"}
 FAISS_OPT_LEVEL=${FAISS_OPT_LEVEL:-"generic"}
 
 CUDA_VERSION="11.0"
